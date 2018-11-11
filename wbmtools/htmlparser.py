@@ -12,26 +12,27 @@
 
 from html.parser import HTMLParser
 
-
 class HTMLTableParser(HTMLParser):
     """ This class serves as a html table parser. It is able to parse multiple
     tables which you feed in. You can access the result per .tables field.
     """
+
     def __init__(self):
         HTMLParser.__init__(self)
         self._in_td = False
         self._in_th = False
-        self._in_title =False
+        self._in_title = False
         self._current_table = []
         self._current_row = []
         self._current_cell = []
-        self._current_tableFormat =[]
+        self._current_tableFormat = []
         self._current_rowFormat = []
         self._current_cellFormat = []
         self.tables = []
         self.tablesFormat = []
         self.titles = []
         self._isBold = "False"
+
 
     def handle_starttag(self, tag, attrs):
         """ We need to remember the opening point for the content of interest.
@@ -47,22 +48,20 @@ class HTMLTableParser(HTMLParser):
             self.tables.append([])
             self.tablesFormat.append([])
 
-        if tag.lower()== 'b':
-            self._isBold="True"
-            
-        
-        
+        if tag.lower() == 'b':
+            self._isBold = "True"
+
 
     def handle_data(self, data):
         """ This is where we save content to a cell """
-#        print data,self._in_td,self._in_th
-       # if self._in_td ^ self._in_th:
+        # print data,self._in_td,self._in_th
+        # if self._in_td ^ self._in_th:
         if self._in_td or self._in_th:
             self._current_cell.append(data.strip())
             self._current_cellFormat.append(self._isBold)
         if self._in_title:
             self.titles.append(data.strip())
-            
+
 
     def handle_endtag(self, tag):
         """ Here we exit the tags. If the closing tag is </tr>, we know that we
@@ -76,29 +75,28 @@ class HTMLTableParser(HTMLParser):
             self._in_th = False
         elif tag == 'title':
             self._in_title = False
-            
-        if tag.lower() =='b':
-            self._isBold ="False"
+
+        if tag.lower() == 'b':
+            self._isBold = "False"
 
         if tag in ['td', 'th']:
-#            print self._current_cell
+            # print self._current_cell
             final_cell = " ".join(self._current_cell).strip()
             self._current_row.append(final_cell)
             self._current_cell = []
 
             final_cellFormat = " ".join(self._current_cellFormat).strip()
-#            print final_cellFormat
+            # print final_cellFormat
             self._current_rowFormat.append(final_cellFormat)
             self._current_cellFormat = []
-            
+
         elif tag == 'tr':
             self.tables[-1].append(self._current_row)
             self._current_row = []
-            
+
             self.tablesFormat[-1].append(self._current_rowFormat)
             self._current_rowFormat = []
-            
-        #elif tag == 'table':
-            #self.tables.append(self._current_table)
-            #self._current_table = []
 
+         # elif tag == 'table':
+         #     self.tables.append(self._current_table)
+         #     self._current_table = []
