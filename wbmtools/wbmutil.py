@@ -6,8 +6,7 @@ def rm_hlt_path_version(name):
     ver_pos = name.rfind("_v")
     if ver_pos != -1:
         return str(name[:ver_pos])
-    else:
-        return str(name)
+    return str(name)
 
 
 def get_hltprescales(triggermode, parser):
@@ -60,6 +59,7 @@ def get_hlt_rates(runnr, parser):
             hlt_rates[path_name] = str(entry[6])
         except IndexError:
             pass
+
     return hlt_rates
 
 
@@ -102,6 +102,7 @@ def get_run_info(runnr, parser):
         run_info["l1Menu"] = "null"
         run_info["cmsswVersion"] = "null"
         run_info["fill"] = "-1"
+
     return run_info
 
 
@@ -131,14 +132,14 @@ def get_pscol_vs_lumisec(runnr, parser):
     psAndInstLumis = {}
     # print(tables[0])
     for line in tables[1]:
-        offset = 0
-        if line[0] == "L S": offset = 41
+        offset = 41 if line[0] == "L S" else 0
         print(line)
         lumiSec = int(line[0+offset])
         preScaleColumn = int(line[1+offset])
         # instLumi = float(line[3+offset])
         print(lumiSec, preScaleColumn)
         psAndInstLumis[lumiSec] = preScaleColumn#, instLumi)
+
     return psAndInstLumis
 
 
@@ -149,8 +150,7 @@ def get_lumis_vs_pscol(runnr, parser):
     lumis_by_ps = {}
     # print(tables[0])
     for line in tables[1]:
-        offset = 0
-        if line[0] == "L S": offset = 41
+        offset = 41 if line[0] == "L S" else 0
         # print(line)
         lumi_sec = int(line[0+offset])
         ps_col = int(line[1+offset])
@@ -160,6 +160,7 @@ def get_lumis_vs_pscol(runnr, parser):
         # instLumi = float(line[3+offset])
         # print(lumiSec, preScaleColumn)
         # psAndInstLumis[lumiSec] = preScaleColumn#, instLumi)
+
     return lumis_by_ps
 
 
@@ -171,8 +172,9 @@ def get_ave_inst_lumi(psAndInstLumis, minLS, maxLS):
         if lumi in psAndInstLumis:
             nrLumis += 1
             lumiSum += psAndInstLumis[lumi][1]
-    if nrLumis != 0: return lumiSum/nrLumis
-    else: return 0
+    if nrLumis != 0:
+        return lumiSum/nrLumis
+    return 0
 
 
 def getHLTRates(runnr, minLS, maxLS):

@@ -29,12 +29,12 @@ class SSOSession:
 
     def _check_valid_setup(self):
         cert_location = os.environ.get('REQUESTS_CA_BUNDLE')
-        if cert_location == None:
+        if cert_location is None:
             print("please set the enviroment varible REQUESTS_CA_BUNDLE "
                   "to point to the location of the CERN CA certs")
             sys.exit()
 
-        if os.path.isfile(cert_location) == False:
+        if os.path.isfile(cert_location) is False:
             print("cern ca certs location {} doesnt exist, please set "
                   "REQUESTS_CA_BUNDLE to the correct location".format(cert_location))
             sys.exit()
