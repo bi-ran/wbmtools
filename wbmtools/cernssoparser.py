@@ -10,7 +10,7 @@
 # Copyright:   (c) Sam Harper 2015
 # Licence:     GPLv3
 # -----------------------------------------------------------------------------
-import cookielib
+import http.cookiejar
 import os
 import sys
 import requests
@@ -32,17 +32,17 @@ class SSOSession:
     def _check_valid_setup(self):
         cert_location = os.environ.get('REQUESTS_CA_BUNDLE')
         if cert_location == None:
-            print "please set the enviroment varible REQUESTS_CA_BUNDLE to point to the location of the CERN CA certs"
+            print("please set the enviroment varible REQUESTS_CA_BUNDLE to point to the location of the CERN CA certs")
             sys.exit()
 
         if os.path.isfile(cert_location) == False:
-            print "cern ca certs location {} doesnt exist, please set REQUESTS_CA_BUNDLE to the correct location" % cookie_location
+            print("cern ca certs location {} doesnt exist, please set REQUESTS_CA_BUNDLE to the correct location".format(cert_location))
             sys.exit()
 
         if sys.version_info< (2,7):
-            print "Warning python version is: "
-            print sys.version
-            print "problems have been encountered in 2.6, suggest you move to>= 2.7 (CMSSW version)"
+            print("Warning python version is: ")
+            print(sys.version)
+            print("problems have been encountered in 2.6, suggest you move to>= 2.7 (CMSSW version)")
             sys.exit()
 
     
@@ -51,7 +51,11 @@ class SSOSession:
             try:
                 self.cookies = cern_sso.krb_sign_on(url)
             except requests.exceptions.HTTPError as ex:
-                print "error in getting kerberos cookies\n    ",ex,"\nmost likely you dont have a kerberos ticket active (or you are not allowed to view the webpage)\ntry doing a kinit\n"
+                print("error in getting kerberos cookies\n",
+                      ex,
+                      "\n",
+                      "most likely you dont have a kerberos ticket active (or you are not allowed to view the webpage)\n"
+                      "try doing a kinit\n")
                 sys.exit()
 
         nr_tries = 0
@@ -62,7 +66,7 @@ class SSOSession:
                 nr_tries = max_tries
             except requests.exceptions.ConnectionError:
                 nr_tries += 1
-                print "connection error, re-trying ",nr_tries
+                print("connection error, re-trying ", nr_tries)
            
         return data.text
   

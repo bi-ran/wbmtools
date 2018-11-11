@@ -1,6 +1,6 @@
 
 
-from wbmparser import WBMParser
+from wbmtools.wbmparser import WBMParser
 
 wbmbase_url="http://cmswbm.cern.ch"
 
@@ -13,7 +13,7 @@ def rm_hlt_path_version(name):
         return str(name)
 
 def get_hltprescales(triggermode,parser):   
-    url=wbmbase_url+"/cmsdb/servlet/TriggerMode?KEY=%s" % triggermode
+    url = "{}/cmsdb/servlet/TriggerMode?KEY={}".format(wbmbase_url, triggermode)
     tables=parser.parse_url_tables(url)
     
     count=0
@@ -21,16 +21,16 @@ def get_hltprescales(triggermode,parser):
         tables=parser.parse_url_tables(url)
         count+=1
     try:
-        #now a little fixing for an error in lines 2 and 3
-        #tables[1][1].append('L1 Prerequisite')
-        #tables[1][2][0] = '0'
+        # now a little fixing for an error in lines 2 and 3
+        # tables[1][1].append('L1 Prerequisite')
+        # tables[1][2][0] = '0'
         return tables[2]
     except IndexError:
-        print "get_hltprescales failed for runnr",runnr
+        print("get_hltprescales failed for runnr", runnr)
         return None
 
 def get_hltsummary(runnr,parser):   
-    url=wbmbase_url+"/cmsdb/servlet/HLTSummary?RUN=%s" % runnr
+    url = "{}/cmsdb/servlet/HLTSummary?RUN={}".format(wbmbase_url, runnr)
     tables=parser.parse_url_tables(url)
     
     count=0
@@ -38,12 +38,12 @@ def get_hltsummary(runnr,parser):
         tables=parser.parse_url_tables(url)
         count+=1
     try:
-        #now a little fixing for an error in lines 2 and 3
-        #tables[1][1].append('L1 Prerequisite')
-        #tables[1][2][0] = '0'
+        # now a little fixing for an error in lines 2 and 3
+        # tables[1][1].append('L1 Prerequisite')
+        # tables[1][2][0] = '0'
         return tables[1]
     except IndexError:
-        print " get_hltsummary failed for runnr",runnr
+        print(" get_hltsummary failed for runnr", runnr)
         return None
     
 def get_hlt_rates(runnr,parser):
@@ -51,7 +51,7 @@ def get_hlt_rates(runnr,parser):
     hltsum = get_hltsummary(runnr,parser)
     hlt_rates={}
     for entry in hltsum:
-#        print runnr,entry
+        # print(runnr, entry)
         try:
             path_name = rm_hlt_path_version(entry[1].split()[0])
             
@@ -64,7 +64,7 @@ def get_hlt_rates(runnr,parser):
 
 
 def get_run_info(runnr,parser):
-    url=wbmbase_url+"/cmsdb/servlet/RunSummary?RUN=%s" % runnr
+    url = "{}/cmsdb/servlet/RunSummary?RUN={}".format(wbmbase_url, runnr)
     tables=parser.parse_url_tables(url)
     
     count=0
@@ -75,7 +75,7 @@ def get_run_info(runnr,parser):
     try:
         tables[1]
     except IndexError:
-        print "get_run_info failed for runnr",runnr
+        print("get_run_info failed for runnr", runnr)
         return None
 
     run_info={}
@@ -92,7 +92,7 @@ def get_run_info(runnr,parser):
     run_info["tier0"]=run_data[10]
     run_info["components"]=run_data[11]
     
-    #this may not actually be filled for some runs
+    # this may not actually be filled for some runs
     try:
         run_data_more = tables[3]
         run_info["l1Menu"] = run_data_more[5][1]
@@ -105,7 +105,7 @@ def get_run_info(runnr,parser):
     return run_info
 
 def get_lumi_summary(runnr,parser):
-    url=wbmbase_url+"/cmsdb/servlet/LumiSections?RUN=%s" % runnr
+    url = "{}/cmsdb/servlet/LumiSections?RUN={}".format(wbmbase_url, runnr)
     tables=parser.parse_url_tables(url)
     
     count=0
@@ -114,49 +114,49 @@ def get_lumi_summary(runnr,parser):
         count+=1
     
     try:
-        #fixing up the summary
+        # fixing up the summary
         tables[1].insert(1,tables[1][0][41:])
         tables[1][0] = tables[1][0][:41]
         return tables[1]
     except IndexError:
-        print "get_lumi_summary failed for runnr",runnr
+        print("get_lumi_summary failed for runnr", runnr)
         return None
 
 def get_pscol_vs_lumisec(runnr,parser):
-    url=wbmbase_url+"/cmsdb/servlet/LumiSections?RUN=%s" % runnr 
+    url="{}/cmsdb/servlet/LumiSections?RUN={}".format(wbmbase_url, runnr)
     tables=parser.parse_url_tables(url)
 
     psAndInstLumis={}
-   # print tables[0]
+    # print(tables[0])
     for line in tables[1]:
         offset=0
         if line[0]=="L S": offset=41
-        print line
+        print(line)
         lumiSec=int(line[0+offset])
         preScaleColumn=int(line[1+offset])
-#        instLumi=float(line[3+offset])
-        print lumiSec,preScaleColumn
+        # instLumi=float(line[3+offset])
+        print(lumiSec, preScaleColumn)
         psAndInstLumis[lumiSec]=preScaleColumn#,instLumi)
     return psAndInstLumis
 
 def get_lumis_vs_pscol(runnr,parser):
-    url=wbmbase_url+"/cmsdb/servlet/LumiSections?RUN=%s" % runnr 
+    url="{}/cmsdb/servlet/LumiSections?RUN={}".format(wbmbase_url, runnr)
     tables=parser.parse_url_tables(url)
 
     lumis_by_ps={}
-   # print tables[0]
+    # print(tables[0])
     for line in tables[1]:
         offset=0
         if line[0]=="L S": offset=41
-#        print line
+        # print(line)
         lumi_sec=int(line[0+offset])
         ps_col=int(line[1+offset])
         if ps_col not in lumis_by_ps:
             lumis_by_ps[ps_col]=[]
         lumis_by_ps[ps_col].append(lumi_sec)
-#        instLumi=float(line[3+offset])
- #       print lumiSec,preScaleColumn
-  #      psAndInstLumis[lumiSec]=preScaleColumn#,instLumi)
+        # instLumi=float(line[3+offset])
+        # print(lumiSec, preScaleColumn)
+        # psAndInstLumis[lumiSec]=preScaleColumn#,instLumi)
     return lumis_by_ps
 
 
@@ -174,14 +174,14 @@ def get_ave_inst_lumi(psAndInstLumis,minLS,maxLS):
 
 
 def getHLTRates(runnr,minLS,maxLS):
-    url=wbmbase_url+"/cmsdb/servlet/HLTSummary?fromLS=%s&toLS=%s&RUN=%s" % (minLS,maxLS,runnr)
+    url="{}/cmsdb/servlet/HLTSummary?fromLS={}&toLS={}&RUN={}".format(wbmbase_url, minLS, maxLS, runnr)
     tables=parseURLTables(url)
 
 
     hltRates={}
     for line in tables[1][2:]:
         rates=[]
-#        print line
+        # print(line)
         for entry in line[3:7]:
             rates.append(float(entry.replace(",","")))
                         
@@ -191,33 +191,33 @@ def getHLTRates(runnr,minLS,maxLS):
 
 
 def get_runs_from_fills(start_date,end_date,wbmparser):
-    url=wbmbase_url+"/cmsdb/servlet/FillSummary?runtimeTypeID=&fromTime=%s&toTime=%s&nameExp=LHCFILL&debug=0&showSection=0" % (start_date,end_date)
+    url = "{}/cmsdb/servlet/FillSummary?runtimeTypeID=&fromTime={}&toTime={}&nameExp=LHCFILL&debug=0&showSection=0".format(wbmbase_url, start_date, end_date)
     tables=wbmparser.parse_url_tables(url)
     runs=[]
     for table in tables:
         if table[0][0]=="Name":
-            #print table
+            # print(table)
             for line in table[1:]:
                 fill_runs=line[13]
-              #  print line
+                # print(line)
                 for run in fill_runs.split():
                     runs.append(run)
     return runs
 
 def get_runs_from_fill(fillnr,wbmparser):
-    url=wbmbase_url+"/cmsdb/servlet/FillRuntimeChart?lhcFillID=%s" % (fillnr)
+    url = "{}/cmsdb/servlet/FillRuntimeChart?lhcFillID={}".format(wbmbase_url, fillnr)
     tables=wbmparser.parse_url_tables(url)
     runs=[]
     for table in tables:
         if table[0][0]=="LHC Fill":
-#            return table[1][1].split()
+            # return table[1][1].split()
             return [s.encode('ascii') for s in table[1][1].split()]
             
 
 
 def get_hlt_prescale_columns(l1_hlt_mode,parser):
     
-    url=wbmbase_url+"/cmsdb/servlet/TriggerMode?KEY=%s" % l1_hlt_mode
+    url = "{}/cmsdb/servlet/TriggerMode?KEY={}".format(wbmbase_url, l1_hlt_mode)
     hlt_ps={}
 
     tables=parser.parse_url_tables(url)
@@ -230,7 +230,7 @@ def get_hlt_prescale_columns(l1_hlt_mode,parser):
 
 
 def get_prescale_set(runnr,parser):
-    url=wbmbase_url+"/cmsdb/servlet/PrescaleSets?RUN=%s" % runnr
+    url = "{}/cmsdb/servlet/PrescaleSets?RUN={}".format(wbmbase_url, runnr)
     tables=parser.parse_url_tables(url)
     
     count=0
@@ -244,15 +244,15 @@ def get_prescale_set(runnr,parser):
         tables[1]
         return tables[1]
     except IndexError:
-        #print parser.read_url(url)
-        print "get_prescale_set failed for runnr",runnr
-        #import sys
-        #sys.exit(0)
+        # print(parser.read_url(url)
+        print("get_prescale_set failed for runnr", runnr)
+        # import sys
+        # sys.exit(0)
     
     return []
 
 def get_prescale_set_with_mask(runnr,parser):
-    url=wbmbase_url+"/cmsdb/servlet/PrescaleSets?RUN=%s" % runnr
+    url = "{}/cmsdb/servlet/PrescaleSets?RUN={}".format(wbmbase_url, runnr)
     tables,format=parser.parse_url_tables_format(url)
     
     count=0
@@ -267,16 +267,16 @@ def get_prescale_set_with_mask(runnr,parser):
         ps_mask = map(lambda x,y:(x,y[0]),tables[1],format[1])
         return ps_mask
     except IndexError:
-        #print parser.read_url(url)
-        print "get_prescale_set_with_mask failed for runnr",runnr
-        #import sys
-        #sys.exit(0)
+        # print(parser.read_url(url))
+        print("get_prescale_set_with_mask failed for runnr", runnr)
+        # import sys
+        # sys.exit(0)
     
     return []
 
 def get_dcs_by_lumi(runnr,parser):
-    url=wbmbase_url+"/cmsdb/servlet/LumiSections?RUN=%s" % runnr 
+    url = "{}/cmsdb/servlet/LumiSections?RUN={}".format(wbmbase_url, runnr)
     tables,tbl_format=parser.parse_url_tables_format(url)
     for index,entry in enumerate(tables[1]):
-        print entry,tbl_format[1][index]
+        print(entry, tbl_format[1][index])
 

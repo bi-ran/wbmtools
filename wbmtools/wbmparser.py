@@ -10,8 +10,8 @@
 # Licence:     GPLv3
 # -----------------------------------------------------------------------------
 
-from cernssoparser import SSOSession
-from htmlparser import HTMLTableParser
+from wbmtools.cernssoparser import SSOSession
+from wbmtools.htmlparser import HTMLTableParser
 
 #it was noticed that if hit the server to fast, we have connection issues
 #therefore we put steps in place to throttle the speed if we detect
