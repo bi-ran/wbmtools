@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 # Name:        html_table_parser
-# Purpose:     Simple class for parsing an (x)html string to extract tables.
+# Purpose:     parsing an (x)html string to extract tables.
 #              Written in python3
 #
 # Author:      Josua Schmid with hacks from Sam Harper
@@ -80,13 +80,11 @@ class HTMLTableParser(HTMLParser):
             self._isBold = "False"
 
         if tag in ['td', 'th']:
-            # print self._current_cell
             final_cell = " ".join(self._current_cell).strip()
             self._current_row.append(final_cell)
             self._current_cell = []
 
             final_cellFormat = " ".join(self._current_cellFormat).strip()
-            # print final_cellFormat
             self._current_rowFormat.append(final_cellFormat)
             self._current_cellFormat = []
 
@@ -96,7 +94,3 @@ class HTMLTableParser(HTMLParser):
 
             self.tablesFormat[-1].append(self._current_rowFormat)
             self._current_rowFormat = []
-
-         # elif tag == 'table':
-         #     self.tables.append(self._current_table)
-         #     self._current_table = []
