@@ -1,7 +1,6 @@
 # -----------------------------------------------------------------------------
 # Name:        cern sso website parser
-# Purpose:     simple function to read the content of a cern sso protected
-#              website in python
+# Purpose:     read content of a cern sso protected website in python
 #
 # Author:      Sam Harper
 #
@@ -15,10 +14,10 @@ import requests
 import cern_sso
 
 class SSOSession:
-    """ Manages a cern single sign on session
+    """ manages a cern single sign on session
 
-    This class authenticates the CERN single sign one (sso) system
-    allowing sso protected pages to be accessed.
+    authenticates the CERN single sign on (sso) system allowing sso protected
+    pages to be accessed.
     """
 
     def __init__(self):
@@ -45,22 +44,15 @@ class SSOSession:
             try:
                 self.cookies = cern_sso.krb_sign_on(url)
             except requests.exceptions.HTTPError as ex:
-                print("error in getting kerberos cookies\n",
-                      ex,
-                      "\n",
-                      "most likely you don't have a kerberos ticket active "
-                      "(or you are not allowed to view the webpage)\n"
-                      "try doing a kinit\n")
+                print("  error in obtaining kerberos cookies\n", ex)
                 sys.exit()
 
-        nr_tries = 0
-        max_tries = 3
-        while nr_tries < max_tries:
+        for _ in range(3):
             try:
                 data = self.session.get(url, cookies=self.cookies)
-                nr_tries = max_tries
+                break
             except requests.exceptions.ConnectionError:
-                nr_tries += 1
-                print("connection error, re-trying ", nr_tries)
+                print("  connection error, retrying...")
+                pass
 
         return data.text
