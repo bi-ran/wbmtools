@@ -25,13 +25,8 @@ class HTMLTableParser(HTMLParser):
         self._current_table = []
         self._current_row = []
         self._current_cell = []
-        self._current_tableFormat = []
-        self._current_rowFormat = []
-        self._current_cellFormat = []
         self.tables = []
-        self.tablesFormat = []
         self.titles = []
-        self._isBold = "False"
 
 
     def handle_starttag(self, tag, attrs):
@@ -46,19 +41,12 @@ class HTMLTableParser(HTMLParser):
             self._in_title = True
         if tag == 'table':
             self.tables.append([])
-            self.tablesFormat.append([])
-
-        if tag.lower() == 'b':
-            self._isBold = "True"
 
 
     def handle_data(self, data):
         """ This is where we save content to a cell """
-        # print data,self._in_td,self._in_th
-        # if self._in_td ^ self._in_th:
         if self._in_td or self._in_th:
             self._current_cell.append(data.strip())
-            self._current_cellFormat.append(self._isBold)
         if self._in_title:
             self.titles.append(data.strip())
 
@@ -76,21 +64,11 @@ class HTMLTableParser(HTMLParser):
         elif tag == 'title':
             self._in_title = False
 
-        if tag.lower() == 'b':
-            self._isBold = "False"
-
         if tag in ['td', 'th']:
             final_cell = " ".join(self._current_cell).strip()
             self._current_row.append(final_cell)
             self._current_cell = []
 
-            final_cellFormat = " ".join(self._current_cellFormat).strip()
-            self._current_rowFormat.append(final_cellFormat)
-            self._current_cellFormat = []
-
         elif tag == 'tr':
             self.tables[-1].append(self._current_row)
             self._current_row = []
-
-            self.tablesFormat[-1].append(self._current_rowFormat)
-            self._current_rowFormat = []

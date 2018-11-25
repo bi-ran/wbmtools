@@ -13,17 +13,6 @@ def get_prescale_sets(parser, run):
         return None
 
 
-def get_prescale_sets_with_mask(parser, run):
-    url = "{}/PrescaleSets?RUN={}".format(urlbase, run)
-    tables, tblfmt = parser.parse_url_tables_format(url)
-
-    try:
-        return map(lambda x, y: (x, y[0]), tables[1], tblfmt[1])
-    except IndexError:
-        print("get_prescale_set_with_mask failed for run", run)
-        return None
-
-
 def get_prescale_columns(parser, key):
     url = "{}/TriggerMode?KEY={}".format(urlbase, key)
     tables = parser.parse_url_tables(url)
@@ -163,10 +152,10 @@ def get_lumis_for_pscol(parser, run):
 
 def get_dcs_by_lumi(parser, run):
     url = "{}/LumiSections?RUN={}".format(urlbase, run)
-    tables, tblfmt = parser.parse_url_tables_format(url)
+    tables = parser.parse_url_tables(url)
 
     for index, entry in enumerate(tables[1]):
-        print(entry, tblfmt[1][index])
+        print(entry)
 
 
 def get_runs_for_fill(parser, fill):

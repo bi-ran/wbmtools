@@ -49,18 +49,3 @@ class WBMParser(SSOSession):
         except:
             pass
         return parser.tables
-
-
-    def parse_url_tables_format(self, url):
-        parser = HTMLTableParser()
-        parser.feed(self.read_url(url))
-        try:
-            for _ in range(10):
-                from time import sleep
-                sleep(3)
-                parser.feed(self.read_url(url))
-                if parser.titles[0] != "Cern Authentication" or len(tables) > 1:
-                    break
-        except:
-            pass
-        return parser.tables, parser.tablesFormat
