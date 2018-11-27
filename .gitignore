@@ -1,0 +1,10 @@
+# ignore files without extensions
+*
+!*.*
+!*/
+
+# temporary files
+*.swp
+
+# python byte-compiled, optimised, dll files
+__pycache__/
