@@ -37,6 +37,9 @@ class HTMLTableParser(HTMLParser):
         if tag == 'table':
             self.tables.append([])
 
+        if any('bgcolor' in attr for attr in attrs):
+            self._current_cell.append(dict(attrs)['bgcolor'])
+
 
     def handle_data(self, data):
         """ This is where we save content to a cell """
