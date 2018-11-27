@@ -20,9 +20,9 @@ def print_hlt_info(run_lumis, paths):
     print('  run: ', run)
 
     table = wbmutil.get_lumis_summary(wbmparser, run)
-    lumis = table[3:-1]
+    lumis = table[1:-1]
 
-    header = [h.replace(' ', '') for h in table[1]]
+    header = [h.replace(' ', '') for h in table[0]]
     physics = header.index('Physics')
     b1pres = header.index('B1Pres')
     b2pres = header.index('B2Pres')

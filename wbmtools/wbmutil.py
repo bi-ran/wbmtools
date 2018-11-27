@@ -157,10 +157,10 @@ def get_runs_for_fill(parser, fill):
     url = "{}/FillRuntimeChart?lhcFillID={}".format(urlbase, fill)
     tables = parser.parse_url_tables(url)
 
-    for table in tables:
-        if table[0][0] == "LHC Fill":
-            return table[1][1].split()
-    return None
+    try:
+        return tables[3][1]
+    except IndexError:
+        return None
 
 
 def get_runs_for_time_period(parser, start_date, end_date):
