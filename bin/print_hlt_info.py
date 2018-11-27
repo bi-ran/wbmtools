@@ -16,21 +16,30 @@ parser.add_argument('--paths', help='hlt paths')
 args = parser.parse_args()
 
 def print_hlt_info(run_lumis, paths):
-    run, minls, maxls = run_lumis
+    run, lsmin, lsmax = run_lumis
     print('  run: ', run)
 
-    lumis_summary = wbmutil.get_lumis_summary(wbmparser, run)
+    table = wbmutil.get_lumis_summary(wbmparser, run)
+    lumis = table[3:-1]
 
-    lumis_filter = list(filter(lambda l: int(l[1]) > 0, lumis_summary[1:]))
-    lumis_list = [int(l[0]) for l in lumis_filter]
-    lumis_valid = [min(lumis_list), max(lumis_list)]
+    header = [h.replace(' ', '') for h in table[1]]
+    physics = header.index('Physics')
+    b1pres = header.index('B1Pres')
+    b2pres = header.index('B2Pres')
 
-    minls = lumis_valid[0] if minls is None else max(lumis_valid[0], minls)
-    maxls = lumis_valid[1] if maxls is None else min(lumis_valid[1], maxls)
+    lsphysics = filter(
+        lambda l: l[physics] == l[b1pres] == l[b2pres] == 'GREEN', lumis[1:])
+    lsfilter = list(filter(lambda l: int(l[1]) > 0, lsphysics))
 
-    # clamp to (minls, maxls)
-    pscol_for_lumis = {int(l[0]): int(l[1]) for l in lumis_filter
-                       if minls <= int(l[0]) <= maxls}
+    lslist = [int(l[0]) for l in lsfilter]
+    lslim = [min(lslist), max(lslist)]
+
+    lsmin = lslim[0] if lsmin is None else max(lslim[0], lsmin)
+    lsmax = lslim[1] if lsmax is None else min(lslim[1], lsmax)
+
+    # clamp to (lsmin, lsmax)
+    pscol_for_lumis = {int(l[0]): int(l[1]) for l in lsfilter
+                       if lsmin <= int(l[0]) <= lsmax}
 
     # divide into lumi sections
     subranges = {(a[0][0], a[-1][0]): a[0][1] for a in [
@@ -45,20 +54,18 @@ def print_hlt_info(run_lumis, paths):
     l1ps = wbmutil.get_prescale_sets(wbmparser, run)
     l1ps = {l[1]: l[2:] for l in l1ps[1:] if l[1]}
 
-    for lumis, pscol in subranges.items():
+    for ls, pscol in subranges.items():
         if not pscol > 0:
             continue
 
         print()
-        print('   lumis: [{}, {}], column: {}\n'.format(
-            lumis[0], lumis[1], pscol))
+        print('   lumis: [{}, {}], column: {}\n'.format(ls[0], ls[1], pscol))
 
-        linst = [float(l[3]) for l in lumis_filter if
-            lumis[0] <= int(l[0]) <= lumis[1]]
+        linst = [float(l[3]) for l in lsfilter if ls[0] <= int(l[0]) <= ls[1]]
         avg_linst = sum(linst) / len(linst)
         print('   luminosity {:.2f}'.format(avg_linst))
 
-        summary = wbmutil.get_hlt_summary(wbmparser, run, lumis[0], lumis[1])
+        summary = wbmutil.get_hlt_summary(wbmparser, run, ls[0], ls[1])
         summary.pop('Name', None)
 
         if paths is None:

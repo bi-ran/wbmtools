@@ -16,24 +16,33 @@ parser.add_argument('--paths', help='hlt paths')
 args = parser.parse_args()
 
 def print_l1_info(run_lumis, paths):
-    run, minls, maxls = run_lumis
+    run, lsmin, lsmax = run_lumis
     print('  run: ', run)
 
-    lumis = wbmutil.get_lumis_summary(wbmparser, run)
+    table = wbmutil.get_lumis_summary(wbmparser, run)
+    lumis = table[3:-1]
 
-    lumis_filter = list(filter(lambda l: int(l[1]) > 0, lumis[1:]))
-    lumis_list = [int(l[0]) for l in lumis_filter]
-    lumis_valid = [min(lumis_list), max(lumis_list)]
+    header = [h.replace(' ', '') for h in table[1]]
+    physics = header.index('Physics')
+    b1pres = header.index('B1Pres')
+    b2pres = header.index('B2Pres')
 
-    minls = lumis_valid[0] if minls is None else max(lumis_valid[0], minls)
-    maxls = lumis_valid[1] if maxls is None else min(lumis_valid[1], maxls)
-    print('   lumis: [{}, {}]\n'.format(minls, maxls))
+    lsphysics = filter(
+        lambda l: l[physics] == l[b1pres] == l[b2pres] == 'GREEN', lumis[1:])
+    lsfilter = list(filter(lambda l: int(l[1]) > 0, lsphysics))
 
-    linst = [float(l[3]) for l in lumis_filter if minls <= int(l[0]) <= maxls]
+    lslist = [int(l[0]) for l in lsfilter]
+    lslim = [min(lslist), max(lslist)]
+
+    lsmin = lslim[0] if lsmin is None else max(lslim[0], lsmin)
+    lsmax = lslim[1] if lsmax is None else min(lslim[1], lsmax)
+    print('   lumis: [{}, {}]\n'.format(lsmin, lsmax))
+
+    linst = [float(l[3]) for l in lsfilter if lsmin <= int(l[0]) <= lsmax]
     avg_linst = sum(linst) / len(linst)
     print('   luminosity {:.2f}'.format(avg_linst))
 
-    summary = wbmutil.get_l1_summary(wbmparser, run, minls, maxls)
+    summary = wbmutil.get_l1_summary(wbmparser, run, lsmin, lsmax)
 
     if paths is None:
         paths = [*summary]
