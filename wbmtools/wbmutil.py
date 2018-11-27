@@ -111,9 +111,6 @@ def get_lumis_summary(parser, run):
     tables = parser.parse_url_tables(url)
 
     try:
-        # fixing up the summary
-        tables[1].insert(1, tables[1][0][41:])
-        tables[1][0] = [s.replace(' ', '') for s in tables[1][0][:41]]
         return tables[1]
     except IndexError:
         print("get_lumi_summary failed for run", run)
@@ -126,10 +123,9 @@ def get_pscol_for_lumis(parser, run):
 
     pscols = {}
     for line in tables[1]:
-        offset = 41 if line[0] == "L S" else 0
-        lumi = int(line[0+offset])
-        pscol = int(line[1+offset])
-        # instlumi = float(line[3+offset])
+        lumi = int(line[0])
+        pscol = int(line[1])
+        # instlumi = float(line[3])
         pscols[lumi] = pscol
 
     return pscols
@@ -141,10 +137,9 @@ def get_lumis_for_pscol(parser, run):
 
     lumis = defaultdict(list)
     for line in tables[1]:
-        offset = 41 if line[0] == "L S" else 0
-        lumi = int(line[0+offset])
-        pscol = int(line[1+offset])
-        # instlumi = float(line[3+offset])
+        lumi = int(line[0])
+        pscol = int(line[1])
+        # instlumi = float(line[3])
         lumis[pscol].append(lumi)
 
     return lumis
