@@ -9,12 +9,6 @@ from wbmtools.wbmparser import WBMParser
 
 wbmparser = WBMParser()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('runs', nargs="+", help='run[:ls:ls]')
-parser.add_argument('--paths', help='hlt paths')
-
-args = parser.parse_args()
-
 def print_l1_info(run_lumis, paths):
     run, lsmin, lsmax = run_lumis
     print('  run: ', run)
@@ -59,8 +53,8 @@ def print_l1_info(run_lumis, paths):
             print('   {} not found'.format(path))
 
 
-def parse_run_lumis(run_lumis):
-    run_lumis = run_lumis.split(':')
+def parse_run_lumis(run):
+    run_lumis = run.split(':')
 
     if len(run_lumis) > 3:
         print('  truncating lumis')
@@ -76,8 +70,7 @@ def parse_run_lumis(run_lumis):
     return [int(l) if l else None for l in run_lumis]
 
 
-if __name__ == '__main__':
-    paths = args.paths
+def main(runs, paths):
     if paths is not None:
         paths = paths.split(',')
 
@@ -85,9 +78,19 @@ if __name__ == '__main__':
             with open(paths[0]) as f:
                 paths = f.read().splitlines()
 
-    for run_lumis in args.runs:
-        run_lumis = parse_run_lumis(run_lumis)
+    for run in runs:
+        run_lumis = parse_run_lumis(run)
 
         if run_lumis is not None:
             print_l1_info(run_lumis, paths)
             print()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('runs', nargs="+", help='run[:ls:ls]')
+    parser.add_argument('-p', '--paths', help='hlt paths')
+
+    args = parser.parse_args()
+
+    main(args.runs, args.paths)

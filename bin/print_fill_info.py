@@ -9,11 +9,6 @@ from wbmtools.wbmparser import WBMParser
 
 wbmparser = WBMParser()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('fills', help='comma-separated')
-
-args = parser.parse_args()
-
 def print_fill_info(fill):
     print('  fill:', fill)
 
@@ -21,8 +16,15 @@ def print_fill_info(fill):
     print(*table[1].split(), sep='\n')
 
 
-if __name__ == '__main__':
-    fills = args.fills.split(',')
-
-    for fill in fills:
+def main(fills):
+    for fill in fills.split(','):
         print_fill_info(fill)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('fills', help='comma-separated')
+
+    args = parser.parse_args()
+
+    main(args.fills)
