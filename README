@@ -1,0 +1,21 @@
+A collection of python scripts to parse information from CMS web based
+monitoring. Anything available in wbm can in theory be parsed.
+
+This uses kerberos-based authenication, therefore you must have a kerberos
+ticket active. Additionally you will the cern certificate CA bundle to allow
+the WBM certificate to be validated. This is most easily obtained from lxplus,
+lxplus.cern.ch:/etc/ssl/certs/ca-bundle.crt
+
+The external requirements can easily be installed with pip in a virtualenv
+
+      python3 -m venv <dir>
+      source <dir>/bin/activate
+      pip install -r requirements.txt
+
+To complete the environment setup
+
+      kinit <user>@CERN.CH
+      export PYTHONPATH=$PYTHONPATH:.
+      export REQUESTS_CA_BUNDLE=ca-bundle.crt
+
+When you are done, type "deactivate" to return to your normal python env
